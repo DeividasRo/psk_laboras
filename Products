@@ -1,0 +1,99 @@
+using System;
+using System.Collections.Generic;
+
+namespace ShoppingApp
+{
+    public class product
+    {
+        public string prdName { get; set; }
+        public decimal Price { get; set; }
+        public bool isAvailable { get; set; }
+        public int StockCount { get; set; }
+
+        public product(string prdName, decimal price, bool available, int stock)
+        {
+            this.prdName = prdName;
+            this.Price = price;
+            this.isAvailable = available;
+            this.StockCount = stock;
+        }
+    }
+
+    public class ProductManager
+    {
+        private List<product> productList;
+
+        public ProductManager()
+        {
+            productList = new List<product>();
+        }
+
+        public void AddProduct(product prd)
+        {
+            productList.Add(prd);
+        }
+
+        public List<product> getAllProducts()
+        {
+            return productList;
+        }
+
+        public decimal calculate_total_price()
+        {
+            decimal total = 0;
+            foreach (var p in productList)
+            {
+                if (p.isAvailable)
+                {
+                    total += p.Price * p.StockCount;
+                }
+            }
+            return total;
+        }
+
+        public product FindProductByName(string prdName, int someValue, string extraInfo)
+        {
+            foreach (var p in productList)
+            {
+                if (p.prdName.ToLower() == prdName.ToLower())
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
+
+        public void update_price(string prdName, decimal newPrice)
+        {
+            foreach (var p in productList)
+            {
+                if (p.prdName == prdName)
+                {
+                    p.Price = newPrice;
+                }
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ProductManager manager = new ProductManager();
+
+            product prd1 = new product("Laptop", 1500.50m, true, 10);
+            product prd2 = new product("Smartphone", 800.99m, true, 5);
+
+            manager.AddProduct(prd1);
+            manager.AddProduct(prd2);
+
+            Console.WriteLine("Total inventory price: $" + manager.calculate_total_price());
+
+            product found = manager.FindProductByName("Laptop", 0, "info");
+            if (found != null)
+            {
+                Console.WriteLine("Found product: " + found.prdName);
+            }
+        }
+    }
+}
