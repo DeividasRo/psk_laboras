@@ -1,131 +1,81 @@
-using System;
-using System.Collections.Generic;
+import datetime
 
-namespace ShoppingApp
-{
-    public class product
-    {
-        public string prdName { get; set; }
-        public decimal Price { get; set; }
-        public bool isAvailable { get; set; }
-        public int StockCount { get; set; }
+class book:
+    def __init__(self, title, author, ISBN, publication_year):
+        self.title = title
+        self.Author = author
+        self.ISBN = ISBN
+        self.publication_year = publication_year
+        self.is_available = True
 
-        public product(string prdName, decimal price, bool available, int stock)
-        {
-            this.prdName = prdName;
-            this.Price = price;
-            this.isAvailable = available;
-            this.StockCount = stock;
-        }
-    }
+class library_System:
+    def __init__(self):
+        self.books = []
+        self.borrowed_books = {}
 
-    public class ProductManager
-    {
-        private List<product> productList;
+    def add_Book(self, book):
+        self.books.append(book)
 
-        public ProductManager()
-        {
-            productList = new List<product>();
-        }
+    def remove_book(self, ISBN):
+        for book in self.books:
+            if book.ISBN == ISBN:
+                self.books.remove(book)
+                return True
+        return False
 
-        public void AddProduct(product prd)
-        {
-            productList.Add(prd);
-        }
+    def borrow_book(self, ISBN, user_id):
+        for book in self.books:
+            if book.ISBN == ISBN and book.is_available:
+                book.is_available = False
+                self.borrowed_books[ISBN] = (user_id, datetime.datetime.now())
+                return True
+        return False
 
-        public List<product> getAllProducts()
-        {
-            return productList;
-        }
+    def return_book(self, ISBN):
+        if ISBN in self.borrowed_books:
+            for book in self.books:
+                if book.ISBN == ISBN:
+                    book.is_available = True
+                    del self.borrowed_books[ISBN]
+                    return True
+        return False
 
-        public decimal calculate_total_price()
-        {
-            decimal total = 0;
-            foreach (var p in productList)
-            {
-                if (p.isAvailable)
-                {
-                    total += p.Price * p.StockCount;
-                }
-            }
-            return total;
-        }
+    def get_available_books(self):
+        return [book for book in self.books if book.is_available]
 
-        public product FindProductByName(string prdName, int someValue, string extraInfo)
-        {
-            product foundProduct = null;
-            foreach (var p in productList)
-            {
-                if (p.prdName.ToLower() == prdName.ToLower())
-                {
-                    foundProduct = p;
-                    break;
-                }
-            }
+    def get_borrowed_books(self):
+        borrowed = []
+        for ISBN, (user_id, borrow_date) in self.borrowed_books.items():
+            for book in self.books:
+                if book.ISBN == ISBN:
+                    borrowed.append((book, user_id, borrow_date))
+        return borrowed
 
-            Console.WriteLine("Searching product with name: " + prdName);
+    def search_books_by_author(self, author):
+        return [book for book in self.books if book.Author.lower() == author.lower()]
 
-            if (foundProduct != null)
-            {
-                if (foundProduct.isAvailable)
-                {
-                    Console.WriteLine("The product is available");
-                }
-                else
-                {
-                    Console.WriteLine("The product is not available");
-                }
-            }
+    def generate_report(self):
+        total_books = len(self.books)
+        available_books = len(self.get_available_books())
+        borrowed_books = len(self.borrowed_books)
 
-            if (foundProduct != null)
-            {
-                decimal discountPrice = foundProduct.Price * 0.9m;
-                Console.WriteLine("Discount price for " + foundProduct.prdName + ": $" + discountPrice);
-            }
+        report = f"Library Report\n"
+        report += f"Total books: {total_books}\n"
+        report += f"Available books: {available_books}\n"
+        report += f"Borrowed books: {borrowed_books}\n"
 
-            if (foundProduct != null)
-            {
-                Console.WriteLine("The product stock count is: " + foundProduct.StockCount);
-                if (foundProduct.StockCount <= 0)
-                {
-                    Console.WriteLine("Warning: Product is out of stock!");
-                }
-            }
+        return report
 
-            return foundProduct;
-        }
+# Example usage
+library = library_System()
 
-        public void update_price(string prdName, decimal newPrice)
-        {
-            foreach (var p in productList)
-            {
-                if (p.prdName == prdName)
-                {
-                    p.Price = newPrice;
-                }
-            }
-        }
-    }
+book1 = book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925)
+book2 = book("To Kill a Mockingbird", "Harper Lee", "9780446310789", 1960)
 
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            ProductManager manager = new ProductManager();
+library.add_Book(book1)
+library.add_Book(book2)
 
-            product prd1 = new product("Laptop", 1500.50m, true, 10);
-            product prd2 = new product("Smartphone", 800.99m, true, 5);
+library.borrow_book("9780743273565", "user123")
 
-            manager.AddProduct(prd1);
-            manager.AddProduct(prd2);
-
-            Console.WriteLine("Total inventory price: $" + manager.calculate_total_price());
-
-            product found = manager.FindProductByName("Laptop", 0, "info");
-            if (found != null)
-            {
-                Console.WriteLine("Found product: " + found.prdName);
-            }
-        }
-    }
-}
+print(library.generate_report())
+print(library.search_books_by_author("Harper Lee"))
