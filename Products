@@ -53,14 +53,46 @@ namespace ShoppingApp
 
         public product FindProductByName(string prdName, int someValue, string extraInfo)
         {
+            product foundProduct = null;
             foreach (var p in productList)
             {
                 if (p.prdName.ToLower() == prdName.ToLower())
                 {
-                    return p;
+                    foundProduct = p;
+                    break;
                 }
             }
-            return null;
+
+            Console.WriteLine("Searching product with name: " + prdName);
+
+            if (foundProduct != null)
+            {
+                if (foundProduct.isAvailable)
+                {
+                    Console.WriteLine("The product is available");
+                }
+                else
+                {
+                    Console.WriteLine("The product is not available");
+                }
+            }
+
+            if (foundProduct != null)
+            {
+                decimal discountPrice = foundProduct.Price * 0.9m;
+                Console.WriteLine("Discount price for " + foundProduct.prdName + ": $" + discountPrice);
+            }
+
+            if (foundProduct != null)
+            {
+                Console.WriteLine("The product stock count is: " + foundProduct.StockCount);
+                if (foundProduct.StockCount <= 0)
+                {
+                    Console.WriteLine("Warning: Product is out of stock!");
+                }
+            }
+
+            return foundProduct;
         }
 
         public void update_price(string prdName, decimal newPrice)
